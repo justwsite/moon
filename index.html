@@ -1,0 +1,151 @@
+<!DOCTYPE html><html lang="ru"><head><meta charset="UTF-8">
+<link rel="icon" href="icon.webp">
+<title>Фазы Луны</title><style>
+* {color: inherit; font-size: inherit; background: #111827; 
+padding: 10px; border-radius: 10px; font-family: sans-serif;}
+body, html {font-size: 25px; color: #ffffff;}
+span, select, option {background: #1f2937;}
+input {border: 0; background: 0; width: 4ch;}
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+-webkit-appearance: none;margin: 0;}
+input[type=number]:focus {outline: none; box-shadow: none;}
+</style></head><body>
+
+Введите Год &emsp;<span><input type="number" min="0" id="numInput"> DR</span><br><br>
+
+День в Forgotten Realms &emsp;<select id="select1">
+<option value="0">&emsp;&emsp;&emsp;&emsp;&emsp;
+</option></select><br><br>
+
+День в Real Life &emsp;<select id="select2">
+<option value="0">&emsp;&emsp;&emsp;&emsp;&emsp;
+</option></select>
+
+<div id="info"></div>
+
+<script>
+  function fill(array, select, index) {
+    select.innerHTML = '';
+    for (let i=0; i<array.length; i++) {
+      let w = array[i][0];
+      let q = array[i][1];
+      for (let k=1; k<=q; k++) {
+        var option = document.createElement('option');
+        d = k;
+        if(q==1) {d = "\xA0\xA0";}
+        p = "\xA0\xA0\xA0";
+        if (k<10) {p = "\xA0\xA0\xA0\xA0\xA0";}
+        option.value = d + " " + w;
+        option.textContent = d + p + w;
+        console.log(option.textContent);
+        select.appendChild(option);}}
+    select.selectedIndex = index || 0;
+  }
+
+  const input = document.getElementById('numInput');
+  const selectfr = document.getElementById('select1');
+  const selectrl = document.getElementById('select2');
+
+  selectfr.addEventListener('change', () => {
+    const Index = selectfr.selectedIndex;
+    selectrl.selectedIndex = Index;
+    moon();
+  });
+  selectrl.addEventListener('change', () => {
+    const Index = selectrl.selectedIndex;
+    selectfr.selectedIndex = Index;
+    moon();
+  });
+
+  function phase(midnight, fullcycle) {
+    let p = 2*Math.PI*midnight/fullcycle;
+    let z = parseInt((1+Math.cos(p))*50);
+    return z + "%";
+  }
+
+  function moon() {
+    var lq = 10957.5; // last quarter
+    var nm = 21915; // new moon
+    var fq = 32872.5; // first quarter
+    var fm = 43830; // full moon
+
+    var d = selectfr.selectedIndex+1;
+    var y = parseInt(input.value)%4;
+    let dd = 0;
+    if (y==0 && d>=214) {dd = 1}
+    var d = (d+dd+365*y)*1440;
+    var half = 720;
+    var start = d-half;
+    var end = d+half;
+    var fullcycle = 43830;
+    let m = 0;
+    while(m+fullcycle < start) {
+      m = m+fullcycle;
+    }
+    start = start-m;
+    end = end-m;
+    var txt = "";
+    if(start==half || end==half || (start <= fm && fm <= end)) {txt = "Полнолуние 100%"}
+    else if(start <= lq && lq <= end) {txt = "Последняя Четверть 50%"}
+    else if(start <= nm && nm <= end) {txt = "Новолуние 0%"}
+    else if(start <= fq && fq<= end) {txt = "Первая Четверть 50%"}
+    else {
+      var midnight = start+half;
+      if(midnight>0 && midnight<lq) {txt = "Убывающая Луна"}
+      else if(midnight>lq && midnight<nm) {txt = "Убывающий Месяц"}
+      else if(midnight>nm && midnight<fq) {txt = "Убывающий Месяц"}
+      else if(midnight>fq && midnight<fm) {txt = "Убывающий Месяц"}
+      txt = txt + " " + phase(midnight, fullcycle);
+    }
+  const div = document.getElementById('info');
+  let a = selectfr.selectedIndex;
+  let b = selectfr.selectedIndex+1;
+  let av = selectfr.options[a]?.value;
+  let bv = selectfr.options[b]?.value;
+  div.textContent = "В ночь с " + av + " по " + bv + " – " + txt;
+  }
+
+  input.addEventListener('input', () => {
+    var y = parseInt(input.value);
+    var FR = [["Хаммер (Deepwinter)", 30], 
+              ["Макушка зимы (Midwinter)", 1], 
+              ["Альтуриак (The Claw of Winter)", 30], 
+              ["Чес (of the Sunsets)", 30], 
+              ["Тарсах (of the Storms)", 30], 
+              ["День Зеленой травы (Greengrass)", 1], 
+              ["Миртул (The Melting)", 30], 
+              ["Киторн (The Time of Flowers)", 30], 
+              ["Флеймрул (Summertide)", 30], 
+              ["Солнцеворот (Midsummer)", 1], 
+              ["Щитовый сход (Shieldmeet)", 0], 
+              ["Элесиас (Highsun)", 30], 
+              ["Элейнт (The Fading)", 30], 
+              ["Праздник урожая (Highharvestide)", 1], 
+              ["Марпенот (Leaffall)", 30], 
+              ["Уктар (The Rotting)", 30], 
+              ["Пир Луны (The Feast of the Moon)", 1], 
+              ["Найтол (The Drawing Down)", 30]];
+    var RL = [["Января", 31], 
+              ["Февраля", 28], 
+              ["Марта", 31], 
+              ["Апреля", 30], 
+              ["Мая", 31], 
+              ["Июня", 30], 
+              ["Июля", 31], 
+              ["Августа", 31], 
+              ["Сентября", 30], 
+              ["Октября", 31], 
+              ["Ноября", 30], 
+              ["Декабря", 31]];
+    if (y%4==0) {
+      FR[10][1] = 1;
+      RL[1][1] = 29;
+    }
+    var index = selectfr.selectedIndex;
+    fill(FR, selectfr, index);
+    index = selectrl.selectedIndex;
+    fill(RL, selectrl, index);
+    moon();
+  });
+</script></body></html>

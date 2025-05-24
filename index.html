@@ -83,7 +83,7 @@ div {white-space: pre;}
   function phase(midnight, fullcycle) {
     let p = 2*Math.PI*midnight/fullcycle;
     let z = parseInt((1+Math.cos(p))*50);
-    return "≈" + z + "%";}
+    return " ≈ " + z + "%";}
   function moon() {
     var lq = 10957.5; // last quarter
     var nm = 21915; // new moon
@@ -117,7 +117,7 @@ div {white-space: pre;}
       else if(midnight>lq && midnight<nm) {txt = "Убывающий Месяц"}
       else if(midnight>nm && midnight<fq) {txt = "Убывающий Месяц"}
       else if(midnight>fq && midnight<fm) {txt = "Убывающий Месяц"}
-      txt = txt + " " + phase(midnight, fullcycle);}
+      txt = txt + phase(midnight, fullcycle);}
   let a = selectfr.selectedIndex;
   let b = selectfr.selectedIndex+1;
   let av = selectfr.options[a]?.value;

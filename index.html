@@ -1,10 +1,9 @@
 <!DOCTYPE html><html lang="ru"><head><meta charset="UTF-8">
 <link rel="icon" href="icon.webp">
-<title>Фазы Луны</title><style>
-* {color: inherit; font-size: inherit; background: #111827; 
-padding: 10px; border-radius: 10px; font-family: sans-serif;}
+<title>Фазы Луны в землях Фаэруна</title><style>
+* {background: #111827; padding: 10px; border-radius: 10px; font-family: sans-serif;}
 body, html {font-size: 25px; color: #ffffff;}
-span, select, option {background: #1f2937;}
+span, select, option, button, input {background: #1f2937; color: inherit; font-size: inherit;}
 input {border: 0; background: 0; width: 4ch;}
 input[type=number]::-webkit-inner-spin-button,
 input[type=number]::-webkit-outer-spin-button {
@@ -14,21 +13,49 @@ input[type=number]:focus {outline: none; box-shadow: none;}
 
 Введите Год &emsp;<span><input type="number" min="0" id="numInput"> DR</span><br><br>
 
-День в Forgotten Realms &emsp;<select id="select1">
-<option value="0">&emsp;&emsp;&emsp;&emsp;&emsp;
-</option></select><br><br>
+День в Forgotten Realms &emsp;<button onclick="prevOption(1)">&#10216</button>
+<select id="select1"></select>
+<button onclick="nextOption(1)">&#10217</button><br><br>
 
-День в Real Life &emsp;<select id="select2">
-<option value="0">&emsp;&emsp;&emsp;&emsp;&emsp;
-</option></select>
+День в Real Life &emsp;<button onclick="prevOption(2)">&#10216</button>
+<select id="select2"></select>
+<button onclick="nextOption(2)">&#10217</button>
 
 <div id="info"></div>
-
 <script>
-  function fill(array, select, index) {
+  const btn = document.querySelectorAll("button")
+  const input = document.getElementById('numInput');
+  const selectfr = document.getElementById('select1');
+  const selectrl = document.getElementById('select2');
+  const div = document.getElementById('info');
+  function prevOption(id) {
+      id1 = 'select' + id;
+      id2 = 'select' + (3-id);
+      var s1 = document.getElementById(id1);
+      var s2 = document.getElementById(id2);
+      var i = s1.selectedIndex;
+      if (i > 0) {i = i-1;}
+      s1.selectedIndex = i;
+      s2.selectedIndex = i;}
+    function nextOption(id) {
+      id1 = 'select' + id;
+      id2 = 'select' + (3-id);
+      var s1 = document.getElementById(id1);
+      var s2 = document.getElementById(id2);
+      var i = s1.selectedIndex;
+      var l = s1.options.length-1;
+      if (i < l) {i = i+1;}
+      s1.selectedIndex = i;
+      s2.selectedIndex = i;}
+  function fill(array, arr, select, index) {
+    if(!input.value) {
+      select.innerHTML = "<option value='0'>&emsp;&emsp;&emsp;&emsp;&emsp;</option>";
+      return;
+    }
     select.innerHTML = '';
     for (let i=0; i<array.length; i++) {
       let w = array[i][0];
+      let v = arr[i][0];
       let q = array[i][1];
       for (let k=1; k<=q; k++) {
         var option = document.createElement('option');
@@ -36,34 +63,24 @@ input[type=number]:focus {outline: none; box-shadow: none;}
         if(q==1) {d = "\xA0\xA0";}
         p = "\xA0\xA0\xA0";
         if (k<10) {p = "\xA0\xA0\xA0\xA0\xA0";}
-        option.value = d + " " + w;
+        option.value = d + " " + v;
         option.textContent = d + p + w;
         console.log(option.textContent);
         select.appendChild(option);}}
-    select.selectedIndex = index || 0;
-  }
-
-  const input = document.getElementById('numInput');
-  const selectfr = document.getElementById('select1');
-  const selectrl = document.getElementById('select2');
-
+    select.selectedIndex = index;}
   selectfr.addEventListener('change', () => {
     const Index = selectfr.selectedIndex;
     selectrl.selectedIndex = Index;
-    moon();
-  });
+    moon();});
   selectrl.addEventListener('change', () => {
     const Index = selectrl.selectedIndex;
     selectfr.selectedIndex = Index;
-    moon();
-  });
+    moon();});
 
   function phase(midnight, fullcycle) {
     let p = 2*Math.PI*midnight/fullcycle;
     let z = parseInt((1+Math.cos(p))*50);
-    return z + "%";
-  }
-
+    return z + "%";}
   function moon() {
     var lq = 10957.5; // last quarter
     var nm = 21915; // new moon
@@ -71,6 +88,10 @@ input[type=number]:focus {outline: none; box-shadow: none;}
     var fm = 43830; // full moon
 
     var d = selectfr.selectedIndex+1;
+    if(!input.value) {
+      div.textContent = "Введите год по летоисчислению Долин.";
+      return;
+    }
     var y = parseInt(input.value)%4;
     let dd = 0;
     if (y==0 && d>=214) {dd = 1}
@@ -80,9 +101,7 @@ input[type=number]:focus {outline: none; box-shadow: none;}
     var end = d+half;
     var fullcycle = 43830;
     let m = 0;
-    while(m+fullcycle < start) {
-      m = m+fullcycle;
-    }
+    while(m+fullcycle < start) {m = m+fullcycle;}
     start = start-m;
     end = end-m;
     var txt = "";
@@ -90,23 +109,21 @@ input[type=number]:focus {outline: none; box-shadow: none;}
     else if(start <= lq && lq <= end) {txt = "Последняя Четверть 50%"}
     else if(start <= nm && nm <= end) {txt = "Новолуние 0%"}
     else if(start <= fq && fq<= end) {txt = "Первая Четверть 50%"}
-    else {
-      var midnight = start+half;
+    else {var midnight = start+half;
       if(midnight>0 && midnight<lq) {txt = "Убывающая Луна"}
       else if(midnight>lq && midnight<nm) {txt = "Убывающий Месяц"}
       else if(midnight>nm && midnight<fq) {txt = "Убывающий Месяц"}
       else if(midnight>fq && midnight<fm) {txt = "Убывающий Месяц"}
-      txt = txt + " " + phase(midnight, fullcycle);
-    }
-  const div = document.getElementById('info');
+      txt = txt + " " + phase(midnight, fullcycle);}
   let a = selectfr.selectedIndex;
   let b = selectfr.selectedIndex+1;
   let av = selectfr.options[a]?.value;
   let bv = selectfr.options[b]?.value;
-  div.textContent = "В ночь с " + av + " по " + bv + " – " + txt;
-  }
+  div.textContent = "В ночь с " + av + " по " + bv + " – " + txt;}
 
   input.addEventListener('input', () => {
+    if (input.value) {btn.forEach(b => b.style.display = "inline-block");} 
+    else {btn.forEach(b => b.style.display = "none");}
     var y = parseInt(input.value);
     var FR = [["Хаммер (Deepwinter)", 30], 
               ["Макушка зимы (Midwinter)", 1], 
@@ -142,10 +159,10 @@ input[type=number]:focus {outline: none; box-shadow: none;}
       FR[10][1] = 1;
       RL[1][1] = 29;
     }
-    var index = selectfr.selectedIndex;
-    fill(FR, selectfr, index);
-    index = selectrl.selectedIndex;
-    fill(RL, selectrl, index);
-    moon();
-  });
+    var index = selectfr.selectedIndex || 0;
+    fill(FR, FR, selectfr, index);
+    index = selectrl.selectedIndex || 0;
+    fill(RL, RL, selectrl, index);
+    moon();});
+  input.dispatchEvent(new Event('input'));
 </script></body></html>

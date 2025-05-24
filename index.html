@@ -115,8 +115,8 @@ div {white-space: pre;}
     else {var midnight = start+half;
       if(midnight>0 && midnight<lq) {txt = "Убывающая Луна"}
       else if(midnight>lq && midnight<nm) {txt = "Убывающий Месяц"}
-      else if(midnight>nm && midnight<fq) {txt = "Растущая Луна"}
-      else if(midnight>fq && midnight<fm) {txt = "Растущий Месяц"}
+      else if(midnight>nm && midnight<fq) {txt = "Растущий Месяц"}
+      else if(midnight>fq && midnight<fm) {txt = "Растущая Луна"}
       txt = txt + phase(midnight, fullcycle);}
   let a = selectfr.selectedIndex;
   let b = selectfr.selectedIndex+1;

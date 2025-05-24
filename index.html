@@ -83,7 +83,7 @@ div {white-space: pre;}
   function phase(midnight, fullcycle) {
     let p = 2*Math.PI*midnight/fullcycle;
     let z = parseInt((1+Math.cos(p))*50);
-    return z + "%";}
+    return "≈" + z + "%";}
   function moon() {
     var lq = 10957.5; // last quarter
     var nm = 21915; // new moon

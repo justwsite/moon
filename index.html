@@ -36,7 +36,8 @@ input[type=number]:focus {outline: none; box-shadow: none;}
       var i = s1.selectedIndex;
       if (i > 0) {i = i-1;}
       s1.selectedIndex = i;
-      s2.selectedIndex = i;}
+      s2.selectedIndex = i;
+      moon();}
     function nextOption(id) {
       id1 = 'select' + id;
       id2 = 'select' + (3-id);
@@ -46,7 +47,8 @@ input[type=number]:focus {outline: none; box-shadow: none;}
       var l = s1.options.length-1;
       if (i < l) {i = i+1;}
       s1.selectedIndex = i;
-      s2.selectedIndex = i;}
+      s2.selectedIndex = i;
+      moon();}
   function fill(array, arr, select, index) {
     if(!input.value) {
       select.innerHTML = "<option value='0'>&emsp;&emsp;&emsp;&emsp;&emsp;</option>";
@@ -125,24 +127,42 @@ input[type=number]:focus {outline: none; box-shadow: none;}
     if (input.value) {btn.forEach(b => b.style.display = "inline-block");} 
     else {btn.forEach(b => b.style.display = "none");}
     var y = parseInt(input.value);
-    var FR = [["Хаммер (Deepwinter)", 30], 
-              ["Макушка зимы (Midwinter)", 1], 
-              ["Альтуриак (The Claw of Winter)", 30], 
-              ["Чес (of the Sunsets)", 30], 
-              ["Тарсах (of the Storms)", 30], 
-              ["День Зеленой травы (Greengrass)", 1], 
-              ["Миртул (The Melting)", 30], 
-              ["Киторн (The Time of Flowers)", 30], 
-              ["Флеймрул (Summertide)", 30], 
-              ["Солнцеворот (Midsummer)", 1], 
-              ["Щитовый сход (Shieldmeet)", 0], 
-              ["Элесиас (Highsun)", 30], 
-              ["Элейнт (The Fading)", 30], 
-              ["Праздник урожая (Highharvestide)", 1], 
-              ["Марпенот (Leaffall)", 30], 
-              ["Уктар (The Rotting)", 30], 
-              ["Пир Луны (The Feast of the Moon)", 1], 
-              ["Найтол (The Drawing Down)", 30]];
+    var FR0 = [["Хаммер (Разгар Зимы)", 30], 
+              ["Макушка зимы (Праздник)", 1], 
+              ["Альтуриак (Месяц Зимы)", 30], 
+              ["Чес (Месяц Закатов)", 30], 
+              ["Тарсах (Месяц Гроз)", 30], 
+              ["День Зеленой травы (Праздник)", 1], 
+              ["Миртул (Месяц Таяния)", 30], 
+              ["Киторн (Время Цветов)", 30], 
+              ["Флеймрул (Месяц Летнего Прилива)", 30], 
+              ["Солнцеворот (Праздник)", 1], 
+              ["Щитовый сход (Праздник)", 0], 
+              ["Элесиас (Месяц Высокого Солнца)", 30], 
+              ["Элейнт (Месяц Увядания)", 30], 
+              ["Праздник урожая (Праздник)", 1], 
+              ["Марпенот (Месяц Листопадов)", 30], 
+              ["Уктар (Месяц Гниения)", 30], 
+              ["Пир Луны (Праздник)", 1], 
+              ["Найтол (Закат Года)", 30]];
+    var FR = [["Хаммер", 30], 
+              ["Макушка зимы", 1], 
+              ["Алтуриак", 30], 
+              ["Чес", 30], 
+              ["Тарсак", 30], 
+              ["Зеленотравье", 1], 
+              ["Миртул", 30], 
+              ["Киторн", 30], 
+              ["Флеймрул", 30], 
+              ["Солнцеворот", 1], 
+              ["Щитовый сход", 0], 
+              ["Элесиас", 30], 
+              ["Элейнт", 30], 
+              ["Праздник урожая", 1], 
+              ["Марпенот", 30], 
+              ["Укта", 30], 
+              ["Пир Луны", 1], 
+              ["Найтол", 30]];
     var RL = [["Января", 31], 
               ["Февраля", 28], 
               ["Марта", 31], 
@@ -160,7 +180,7 @@ input[type=number]:focus {outline: none; box-shadow: none;}
       RL[1][1] = 29;
     }
     var index = selectfr.selectedIndex || 0;
-    fill(FR, FR, selectfr, index);
+    fill(FR, FR0, selectfr, index);
     index = selectrl.selectedIndex || 0;
     fill(RL, RL, selectrl, index);
     moon();});

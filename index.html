@@ -2,7 +2,7 @@
 <link rel="icon" href="icon.webp">
 <title>Фазы Луны в землях Фаэруна</title><style>
 * {background: #111827; padding: 10px; border-radius: 10px; font-family: sans-serif;}
-body, html {font-size: 25px; color: #ffffff;}
+body, html {font-size: 25px; color: #ffffff; border-radius: 0;}
 span, select, option, button, input {background: #1f2937; color: inherit; font-size: inherit;}
 input {border: 0; background: 0; width: 4ch;}
 input[type=number]::-webkit-inner-spin-button,
@@ -29,47 +29,60 @@ div {white-space: pre;}
   const selectfr = document.getElementById('select1');
   const selectrl = document.getElementById('select2');
   const div = document.getElementById('info');
-  function prevOption(id) {
-      id1 = 'select' + id;
-      id2 = 'select' + (3-id);
-      var s1 = document.getElementById(id1);
-      var s2 = document.getElementById(id2);
-      var i = s1.selectedIndex;
-      if (i > 0) {i = i-1;}
-      s1.selectedIndex = i;
-      s2.selectedIndex = i;
-      moon();}
-    function nextOption(id) {
-      id1 = 'select' + id;
-      id2 = 'select' + (3-id);
-      var s1 = document.getElementById(id1);
-      var s2 = document.getElementById(id2);
-      var i = s1.selectedIndex;
-      var l = s1.options.length-1;
-      if (i < l) {i = i+1;}
-      s1.selectedIndex = i;
-      s2.selectedIndex = i;
-      moon();}
-  function fill(array, arr, select, index) {
+
+  function phase(m) {
+    var cycle = 43830;
+    let formula = 2*Math.PI*(m+cycle/2)/cycle;
+    let result = Math.round( ((1-Math.cos(formula))*50) *100)/100;
+    return result;}
+  function moon() {
+    var minutes = [0, 10957.5, 21915, 32872.5, 43830];
+    var title = ["&#x1F315; Полнолуние", "&#x1F317; Последняя Четверть", "&#x1F311; Новолуние", "&#x1F313; Первая Четверть"];
+    var dop = ["&#x1F316; Убывающая Луна", "&#x1F318; Убывающий Месяц", "&#x1F312; Растущий Месяц", "&#x1F314; Растущая Луна"];
+    var d = selectfr.selectedIndex+1;
     if(!input.value) {
-      select.innerHTML = "<option value='0'>&emsp;&emsp;&emsp;&emsp;&emsp;</option>";
+      div.innerHTML = "Введите год по летоисчислению Долин.";
       return;
     }
-    select.innerHTML = '';
-    for (let i=0; i<array.length; i++) {
-      let w = array[i][0];
-      let v = arr[i][0];
-      let q = array[i][1];
-      for (let k=1; k<=q; k++) {
-        var option = document.createElement('option');
-        d = k;
-        if(q==1) {d = "\xA0\xA0";}
-        p = "\xA0\xA0\xA0";
-        if (k<10) {p = "\xA0\xA0\xA0\xA0\xA0";}
-        option.value = d + " " + v;
-        option.textContent = d + p + w;
-        select.appendChild(option);}}
-    select.selectedIndex = index;}
+    var y = ((parseInt(input.value) % 4) + 4) % 4;
+    let dd = 1;
+    if (y==0 && d<214) {dd = 0}
+    d = (d+dd+365*y)*1440;
+    while(d-1440>43830) {d=d-43830;}
+    var start = d-1440;
+    var end = d-1;
+    var txt = "";
+    for(let i=0; i<5; i++) {
+      if(start <= minutes[i] && minutes[i] <= end) {
+        if(minutes[i]<d+720) {
+          var first = selectfr.selectedIndex-1;
+          var second = selectfr.selectedIndex;
+        } else {
+          var first = selectfr.selectedIndex;
+          var second = selectfr.selectedIndex+1;
+        }
+        let limit = selectfr.options.length-1;
+        if(first<0) {first = limit;}
+        if(second>limit) {second = 0;}
+        let a = selectfr.options[first]?.value;
+        let b = selectfr.options[second]?.value;
+        txt = title[i%4] + '\n' + "В ночь с " + a + " по " + b;
+        break;
+      }
+    }
+    if(txt=="") {
+      let round = 0;
+      for(let i=0; i<4; i++) {round=round+phase(d + (i * 360));}
+      round = (round/4).toFixed(2);
+      for(let i=0; i<4; i++) {
+        if(minutes[i] <= d && d <= minutes[i+1]) {
+          txt = dop[i] + "(" + round + "%)";
+          break;
+        }
+      }
+    }
+    div.innerHTML = txt;}
+
   selectfr.addEventListener('change', () => {
     const Index = selectfr.selectedIndex;
     selectrl.selectedIndex = Index;
@@ -79,51 +92,63 @@ div {white-space: pre;}
     selectfr.selectedIndex = Index;
     moon();});
 
-  function phase(midnight, fullcycle) {
-    let p = 2*Math.PI*midnight/fullcycle;
-    let z = parseInt((1+Math.cos(p))*50);
-    return z + "%";}
-  function moon() {
-    var lq = 10957.5; // last quarter
-    var nm = 21915; // new moon
-    var fq = 32872.5; // first quarter
-    var fm = 43830; // full moon
+  function prevOption(id) {
+      var id1 = 'select' + id;
+      var id2 = 'select' + (3-id);
+      var s1 = document.getElementById(id1);
+      var s2 = document.getElementById(id2);
+      var i = s1.selectedIndex;
+      let limit = s1.options.length-1;
+      if (i > 0) {i = i-1;}
+      else {i = limit;
+        input.value = parseInt(input.value)-1;}
+      s1.selectedIndex = i;
+      s2.selectedIndex = i;
+      input.dispatchEvent(new Event('input'));
+      }
+    function nextOption(id) {
+      var id1 = 'select' + id;
+      var id2 = 'select' + (3-id);
+      var s1 = document.getElementById(id1);
+      var s2 = document.getElementById(id2);
+      var i = s1.selectedIndex;
+      let limit = s1.options.length-1;
+      if (i < limit) {i = i+1;}
+      else {i=0;
+        input.value = parseInt(input.value)+1;}
+      s1.selectedIndex = i;
+      s2.selectedIndex = i;
+      input.dispatchEvent(new Event('input'));}
 
-    var d = selectfr.selectedIndex+1;
+  function fill(array, arr, select) {
+    var index = selectfr.selectedIndex || 0;
     if(!input.value) {
-      div.textContent = "Введите год по летоисчислению Долин.";
+      let o = "&emsp;".repeat(6);
+      select.innerHTML = "<option value='0'>" + o + "</option>";
       return;
     }
-    var y = parseInt(input.value)%4;
-    let dd = 0;
-    if (y==0 && d>=214) {dd = 1}
-    var d = (d+dd+365*y)*1440;
-    var start = d;
-    var end = d+1440;
-    var fullcycle = 43830;
-    let m = 0;
-    while(m+fullcycle < start) {m = m+fullcycle;}
-    start = start-m;
-    end = end-m;
-    var txt = "";
-    if(start==0 || end==0 || (start <= fm && fm <= end)) {txt = "Полнолуние 100%"}
-    else if(start <= lq && lq <= end) {txt = "Последняя Четверть 50%"}
-    else if(start <= nm && nm <= end) {txt = "Новолуние 0%"}
-    else if(start <= fq && fq<= end) {txt = "Первая Четверть 50%"}
-    else {var midnight = start+720;
-      if(midnight>0 && midnight<lq) {txt = "Убывающая Луна"}
-      else if(midnight>lq && midnight<nm) {txt = "Убывающий Месяц"}
-      else if(midnight>nm && midnight<fq) {txt = "Растущий Месяц"}
-      else if(midnight>fq && midnight<fm) {txt = "Растущая Луна"}
-      txt = txt + " " + phase(midnight, fullcycle);}
-  let a = selectfr.selectedIndex;
-  let av = selectfr.options[a]?.value;
-  div.textContent = av + " – " + txt;}
+    select.innerHTML = '';
+    for (let i=0; i<array.length; i++) {
+      let w = array[i][0];
+      let v = arr[i][0];
+      let q = array[i][1];
+      for (let k=1; k<=q; k++) {
+        var d = k;
+        var option = document.createElement('option');
+        let spaces = 3;
+        if(q==1) {d = "";
+          spaces = 7;}
+        else if(d<10) {spaces = 5;}
+        option.value = d + " " + v;
+        option.textContent = d + "\xA0".repeat(spaces) + w;
+        select.appendChild(option);}}
+    if(index>=selectfr.options.length) {index=selectfr.options.length-1;}
+    select.selectedIndex = index;}
 
   input.addEventListener('input', () => {
     if (input.value) {btn.forEach(b => b.style.display = "inline-block");} 
     else {btn.forEach(b => b.style.display = "none");}
-    var y = parseInt(input.value);
+    var y = parseInt(input.value) || 0;
     var FR0 = [["Хаммер (Разгар Зимы)", 30], 
               ["Макушка зимы (Праздник)", 1], 
               ["Альтуриак (Месяц Зимы)", 30], 
@@ -176,10 +201,8 @@ div {white-space: pre;}
       FR[10][1] = 1;
       RL[1][1] = 29;
     }
-    var index = selectfr.selectedIndex || 0;
-    fill(FR, FR0, selectfr, index);
-    index = selectrl.selectedIndex || 0;
-    fill(RL, RL, selectrl, index);
+    fill(FR, FR0, selectfr);
+    fill(RL, RL, selectrl);
     moon();});
   input.dispatchEvent(new Event('input'));
 </script></body></html>
